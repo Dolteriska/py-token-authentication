@@ -97,7 +97,14 @@ class MovieViewSet(mixins.ListModelMixin,
         return MovieSerializer
 
 
-class MovieSessionViewSet(viewsets.ModelViewSet):
+class MovieSessionViewSet(
+    mixins.ListModelMixin,
+    mixins.CreateModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.UpdateModelMixin,
+    mixins.DestroyModelMixin,
+    viewsets.GenericViewSet,
+):
     queryset = (
         MovieSession.objects.all()
         .select_related("movie", "cinema_hall")
@@ -153,8 +160,6 @@ class OrderViewSet(mixins.ListModelMixin,
     permission_classes = (IsAdminOrIfAuthenticatedReadOnly, )
 
     def get_queryset(self):
-        if self.request.user.is_staff:
-            return self.queryset
         return self.queryset.filter(user=self.request.user)
 
     def get_serializer_class(self):
