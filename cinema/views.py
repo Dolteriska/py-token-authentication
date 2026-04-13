@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from django.db.models import F, Count
+from django.template.context_processors import request
 from rest_framework import viewsets, mixins
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.pagination import PageNumberPagination
@@ -152,7 +153,9 @@ class OrderViewSet(mixins.ListModelMixin,
     permission_classes = (IsAdminOrIfAuthenticatedReadOnly, )
 
     def get_queryset(self):
-        return Order.objects.filter(user=self.request.user)
+        if self.request.user.is_staff:
+            return self.queryset
+        return self.queryset.filter(user=self.request.user)
 
     def get_serializer_class(self):
         if self.action == "list":
